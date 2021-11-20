@@ -4,7 +4,14 @@
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">   
+  <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
+  <script>
+    window.TrackJS && TrackJS.install({ 
+      token: "d6e6fd5b69c5490da7300de3e0a8aa27"
+      // for more configuration options, see https://docs.trackjs.com
+    });
+  </script>     
   <title>Lab 9</title>
 
   <style>
@@ -88,20 +95,150 @@
   </main>
 
   <script>
+    class InvalidNumberError extends Error{
+      constructor(message){
+        super(message);
+        this.name = "InvalidNumberError";
+      }
+    }
+
     let form = document.querySelector('form');
     form.addEventListener('submit', e => {
       e.preventDefault();
-      let output = document.querySelector('output');
-      let firstNum = document.querySelector('#first-num').value;
-      let secondNum = document.querySelector('#second-num').value;
-      let operator = document.querySelector('#operator').value;
-      output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      let output;
+      let firstNum;
+      let secondNum;
+      let operator;
+      
+      try{
+        output = document.querySelector('output');
+        firstNum = document.querySelector('#first-num').value;
+        secondNum = document.querySelector('#second-num').value;
+        operator = document.querySelector('#operator').value;
+
+        if(firstNum == null || firstNum == "" || secondNum == null || secondNum == ""){
+          throw new Error("Don't leave operands blank.")
+        }
+
+        let regEX = /[a-zA-Z]/g;
+        if(regEX.test(firstNum) || regEX.test(secondNum)) {
+          throw new InvalidNumberError("Do not put letters in operands.")
+        }
+
+        output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      }
+      catch(err){
+        TrackJS.track(err);       
+        console.log(err);
+      }
     });
 
     let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
 
     // Start your code here
     // You may move this JS to another file if you wish
+
+    // Used to reference which button is being pressed
+    let buttons = document.querySelector("#error-btns").getElementsByTagName("button");
+
+    // Console Log
+    let consoleLogButton = buttons[0];
+    consoleLogButton.addEventListener("click", () =>{
+      console.log("Console Log Demo");
+    });
+
+    // Console Error
+    let consoleErrorButton = buttons[1];
+    consoleErrorButton.addEventListener("click", () => {
+      console.error("Console Error Demo");
+    });
+
+    // Console Count
+    let count = 0;
+    let consoleCountButton = buttons[2];
+    consoleCountButton.addEventListener("click", () => {
+      count++;
+      console.log("Count Button: " + count);
+    });
+
+    // Console Warn
+    let consoleWarnButton = buttons[3];
+    consoleWarnButton.addEventListener("click", () =>{
+      console.warn("Console Warn Button");
+    });
+
+    // Console Assert
+    let number = 2;
+    let consoleAssertButton = buttons[4];
+    consoleAssertButton.addEventListener("click", () =>{
+      console.assert(number == 3, {number: number, errorMsg: "The number does not equal 3"});
+    });
+
+    // Console Clear
+    let consoleClearButton = buttons[5];
+    consoleClearButton.addEventListener("click", () => {
+      console.clear();
+    });
+
+    // Console Dir
+    let consoleDirButton = buttons[6];
+    consoleDirButton.addEventListener("click", () => {
+      console.dir(consoleDirButton);
+    });
+
+    // Console Dirxml
+    let consoleDirxmlButton = buttons[7];
+    consoleDirxmlButton.addEventListener("click", () => {
+      console.dirxml(consoleDirxmlButton);
+    })
+
+    // Console Group Start & End
+    let consoleGroupStart = buttons[8];
+    let consoleGroupEnd = buttons[9];
+
+    consoleGroupStart.addEventListener("click", () => {
+      console.group();
+    });
+
+    consoleGroupEnd.addEventListener("click", () => {
+      console.groupEnd();
+    })
+
+    // Console Table
+    let classes = [["CSE 110", "Introduction to Software Engineering"], ["CSE 101", "Algorithms"], ["ECE 35", "Circuit Analysis"]];
+    let consoleTableButton = buttons[10];
+    consoleTableButton.addEventListener("click", () => {
+      console.table(classes);
+    });
+
+    // Start Timer and End Timer
+    let consoleStartTimeButton = buttons[11];
+    let consoleEndTimeButton = buttons[12];
+
+    consoleStartTimeButton.addEventListener("click", () => {
+      console.time();
+    });
+
+    consoleEndTimeButton.addEventListener("click", () => {
+      console.timeEnd();
+    });
+
+    // Console Trace
+    let consoleTraceButton = buttons[13];
+    consoleTraceButton.addEventListener("click", () => {
+      console.trace();
+    });
+
+    // Trigger a Global Error
+    let globalErrorButton = buttons[14];
+    window.addEventListener("error", function(event){
+        console.error("WHOOPS! An error occurred with \"Trigger a Global Error\" button!");
+    });
+    globalErrorButton.addEventListener("click", () => {
+      let test = document.querySelector("#abcxyz");
+      test.value;
+    });
+
   </script>
 </body>
 
